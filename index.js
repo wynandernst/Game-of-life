@@ -1,9 +1,6 @@
-
 const readline = require("readline");
 
-
-
-//Utils 
+//Utils
 
 function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -17,23 +14,16 @@ function getRow() {
   return row;
 }
 
-
-
-
 // Default board size if no args provided
 let TOTAL_ROWS = 20;
 let TOTAL_COLUMNS = 16;
 
-
-
 let int = null;
 let currentIteration = 0;
-
 
 // Tried using emojis but they make the spacing inconsistent, using block characters instead. You can change these to whatever you like, as long as they are the same length for consistent spacing.
 const DEAD = "░░";
 const LIVE = "██";
-
 
 const args = process.argv.slice(2);
 if (args.length > 1) {
@@ -46,34 +36,7 @@ let RENDER_TOP = 0;
 let FRAME_HEIGHT = 0;
 let cursorHidden = false;
 
-// init board
-for (let i = 0; i < TOTAL_ROWS; i++) {
-  GAME_MATRIX.push(getRow());
-}
-
-FRAME_HEIGHT = TOTAL_ROWS + 2;
-
-// First render
-setupFrame();
-printGameMatrix();
-
-int = setInterval(() => {
-  currentIteration++;
-  const changed = transitionToNextPhase();
-  printGameMatrix();
-
-  if (!changed) {
-    stop("THE END!");
-  }
-}, 200);
-
-// Clean exit on Ctrl+C
-process.once("SIGINT", () => stop());
-
-
-
-
-// game logic 
+//game logic
 
 function transitionToNextPhase() {
   let hasChanged = false;
@@ -105,13 +68,12 @@ function transitionToNextPhase() {
 function getNeighbourInfo(matrix, row, column) {
   const info = {
     live: 0,
-    dead: 0
+    dead: 0,
   };
 
-  // Check all surrounding cells (3x3 area around the current cell)
+  // Check all surrounding cells
   for (let neighbourRow = row - 1; neighbourRow <= row + 1; neighbourRow++) {
     for (let neighbourCol = column - 1; neighbourCol <= column + 1; neighbourCol++) {
-
       // Skip the cell itself
       if (neighbourRow === row && neighbourCol === column) {
         continue;
@@ -138,8 +100,7 @@ function getNeighbourInfo(matrix, row, column) {
   return info;
 }
 
-
-//  rendering
+// rendering
 
 function setupFrame() {
   hideCursor();
@@ -149,7 +110,6 @@ function setupFrame() {
   // Prints blank lines once, then rewrites in-place.
   process.stdout.write("\n".repeat(FRAME_HEIGHT));
 
-  
   readline.cursorTo(process.stdout, 0, RENDER_TOP);
 }
 
@@ -162,7 +122,7 @@ function printGameMatrix() {
   // Spacer line
   writeLineAt(0, RENDER_TOP + TOTAL_ROWS, "");
 
-  // Shows how many iterations have passed, below the frame
+  // Shows how many iterations have passed, below the game board
   writeLineAt(0, RENDER_TOP + TOTAL_ROWS + 1, "Iteration # " + currentIteration);
 }
 
@@ -177,7 +137,6 @@ function stop(message) {
   int = null;
 
   if (message) {
-    // Write message under the frame
     writeLineAt(0, RENDER_TOP + FRAME_HEIGHT, message);
   }
 
@@ -201,4 +160,73 @@ function showCursor() {
   process.stdout.write("\x1B[?25h");
 }
 
+// start 
+function start() {
+  // init board
+  GAME_MATRIX = [];
+  for (let i = 0; i < TOTAL_ROWS; i++) {
+    GAME_MATRIX.push(getRow());
+  }
 
+  FRAME_HEIGHT = TOTAL_ROWS + 2;
+
+  // First render
+  setupFrame();
+  printGameMatrix();
+
+  int = setInterval(() => {
+    currentIteration++;
+    const changed = transitionToNextPhase();
+    printGameMatrix();
+
+    if (!changed) {
+      stop("THE END!");
+    }
+  }, 200);
+
+  // Clean exit on Ctrl+C
+  process.once("SIGINT", () => stop());
+}
+
+if (require.main === module) {
+  start();
+}
+
+
+module.exports = {
+  DEAD,
+  LIVE,
+
+  getRandomNumber,
+  getRow,
+
+  transitionToNextPhase,
+  getNeighbourInfo,
+
+  setupFrame,
+  printGameMatrix,
+  writeLineAt,
+
+  start,
+
+  __state: {
+    get TOTAL_ROWS() {
+      return TOTAL_ROWS;
+    },
+    get TOTAL_COLUMNS() {
+      return TOTAL_COLUMNS;
+    },
+    get GAME_MATRIX() {
+      return GAME_MATRIX;
+    },
+    set GAME_MATRIX(v) {
+      GAME_MATRIX = v;
+    },
+    set TOTAL_ROWS(v) {
+      TOTAL_ROWS = v;
+    },
+    set TOTAL_COLUMNS(v) {
+      TOTAL_COLUMNS = v;
+    },
+  },
+};
