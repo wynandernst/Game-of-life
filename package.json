@@ -1,0 +1,20 @@
+{
+  "name": "game-of-life",
+  "version": "1.0.0",
+  "description": "Example of Conway's Game of Life",
+  "homepage": "https://github.com/wynandernst/Game-of-life#readme",
+  "bugs": {
+    "url": "https://github.com/wynandernst/Game-of-life/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wynandernst/Game-of-life.git"
+  },
+  "license": "ISC",
+  "author": "Wynand Ernst",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  }
+}
