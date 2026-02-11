@@ -17,6 +17,7 @@ function getRow() {
 // Default board size if no args provided
 let TOTAL_ROWS = 20;
 let TOTAL_COLUMNS = 16;
+let MAX_GENERATIONS = Infinity; // 0 or Infinity = unlimited
 
 let int = null;
 let currentIteration = 0;
@@ -26,9 +27,12 @@ const DEAD = "░░";
 const LIVE = "██";
 
 const args = process.argv.slice(2);
-if (args.length > 1) {
+if (args.length >= 2) {
   TOTAL_ROWS = parseInt(args[0], 10);
   TOTAL_COLUMNS = parseInt(args[1], 10);
+}
+if (args.length >= 3) {
+  MAX_GENERATIONS = parseInt(args[2], 10);
 }
 
 let GAME_MATRIX = [];
@@ -180,7 +184,9 @@ function start() {
     printGameMatrix();
 
     if (!changed) {
-      stop("THE END!");
+      stop("THE END! Steady state reached.");
+    } else if (currentIteration >= MAX_GENERATIONS) {
+      stop("THE END! Max generations reached.");
     }
   }, 200);
 
@@ -219,6 +225,9 @@ module.exports = {
     get GAME_MATRIX() {
       return GAME_MATRIX;
     },
+    get MAX_GENERATIONS() {
+      return MAX_GENERATIONS;
+    },
     set GAME_MATRIX(v) {
       GAME_MATRIX = v;
     },
@@ -227,6 +236,9 @@ module.exports = {
     },
     set TOTAL_COLUMNS(v) {
       TOTAL_COLUMNS = v;
+    },
+    set MAX_GENERATIONS(v) {
+      MAX_GENERATIONS = v;
     },
   },
 };
